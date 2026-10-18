@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>СОЧ за 1 четверть — Физика, 10 класс ОГН</title>
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:system-ui,Arial,sans-serif;background:#eef3fb;color:#1b2a41}
+.w{max-width:820px;margin:0 auto;padding:14px}.box{background:#fff;border-radius:14px;padding:20px;box-shadow:0 2px 10px #0002;margin:14px 0}
+h1{font-size:22px;margin:0 0 6px;color:#1a4fa0}label{display:block;margin:12px 0 4px;font-weight:600}
+input[type=text],select{width:100%;padding:11px;font-size:16px;border:2px solid #b9c7e2;border-radius:8px}
+button{background:#1a73e8;color:#fff;border:0;padding:13px 24px;font-size:17px;border-radius:10px;cursor:pointer;margin-top:16px}button:disabled{background:#a9b6cc;cursor:not-allowed}
+#bar{position:sticky;top:0;z-index:5;background:#1a4fa0;color:#fff;padding:10px 16px;display:flex;justify-content:space-between;font-weight:700}
+#tm.low{color:#ffd54f}.card h3{margin:0 0 8px}.card h3 b{color:#d84315;font-size:15px}.opt{display:block;padding:8px 10px;margin:6px 0;border:2px solid #d5deef;border-radius:8px;font-weight:400;cursor:pointer}
+.opt:has(input:checked){background:#e3f0ff;border-color:#1a73e8}.fr{margin:10px 0}.fr input{max-width:260px}small{display:block;color:#6a5200;background:#fff6d6;padding:4px 8px;border-radius:6px;margin-top:4px}
+.sv{text-align:center;margin:8px 0}#mod{position:fixed;inset:0;background:#000a;display:none;align-items:center;justify-content:center;z-index:9}#mod div{background:#fff;padding:24px;border-radius:14px;max-width:360px}
+.hid{display:none}
+</style></head><body><div class="w">
+<div id="s1" class="box"><h1>Суммативное оценивание за 1 четверть</h1><div>Физика · 10 класс ОГН · 13 заданий · 30 баллов · 40 минут</div>
+<label>Фамилия и имя</label><input type="text" id="fio" placeholder="Введите ФИ" autocomplete="off">
+<label>Класс</label><select id="cls"><option value="">— выберите —</option><option>10Б</option></select>
+<label>Вариант</label><select id="var"><option value="">— выберите —</option><option value="1">Вариант 1</option><option value="2">Вариант 2</option></select>
+<small>Во время работы нельзя сворачивать окно или переключаться на другие вкладки/приложения — работа будет завершена автоматически. Изменение размера окна: 1-е — предупреждение, 2-е — завершение работы.</small>
+<button id="go" disabled>Далее</button></div>
+<div id="s2" class="hid"><div id="bar"><span id="who"></span><span>⏱ <span id="tm">40:00</span></span></div><div id="qs"></div>
+<div class="box"><button id="fin">Завершить работу</button></div></div>
+<div id="s3" class="box hid"></div></div>
+<div id="mod"><div><h2>⚠ Предупреждение</h2><p>Обнаружено изменение размера окна. При повторном изменении работа будет завершена.</p><button onclick="mod.style.display='none'">Понятно</button></div></div>
+<script>
+const URL_SCRIPT='https://script.google.com/macros/s/AKfycbxkgajBr-2nuzuYpd-QMET8tLIk4QwmQRQFC9-0IH3i5bDBTgO4SjsKVUuRBx6fjiPwEA/exec';
+const $=id=>document.getElementById(id),fmt=n=>String(+(+n).toFixed(2)).replace('.',',');
+const fine=matchMedia('(pointer:fine)').matches;
+/* ---------- SVG ---------- */
+function graph(xm,ym,st,pts,xl,yl){const c=28,L=44,T=20,B=T+ym/st*c,W=L+xm*c+26,H=B+34;
+let s=`<svg viewBox="0 0 ${W} ${H}" width="${W}" style="max-width:100%;background:#fffdf0;border-radius:8px">`;
+for(let i=0;i<=xm;i++){const x=L+i*c;s+=`<line x1="${x}" y1="${T}" x2="${x}" y2="${B}" stroke="${i?'#9ccc65':'#000'}" stroke-width="${i?1:2}"/><text x="${x}" y="${B+16}" font-size="12" text-anchor="middle">${i}</text>`}
+for(let j=0;j<=ym/st;j++){const y=B-j*c;s+=`<line x1="${L}" y1="${y}" x2="${L+xm*c}" y2="${y}" stroke="${j?'#9ccc65':'#000'}" stroke-width="${j?1:2}"/><text x="${L-6}" y="${y+4}" font-size="12" text-anchor="end">${j*st}</text>`}
+const P=pts.map(p=>[L+p[0]*c,B-p[1]/st*c]);
+s+=`<polygon points="${P.map(p=>p.join(',')).join(' ')} ${P[P.length-1][0]},${B} ${P[0][0]},${B}" fill="#ff9800" opacity=".18"/><polyline points="${P.map(p=>p.join(',')).join(' ')}" fill="none" stroke="#e53935" stroke-width="3"/>`;
+P.forEach(p=>s+=`<circle cx="${p[0]}" cy="${p[1]}" r="4" fill="#c62828"/>`);
+return s+`<text x="${L+xm*c+4}" y="${B+30}" font-size="13" text-anchor="end" font-weight="700" fill="#1a4fa0">${xl}</text><text x="${L+6}" y="13" font-size="13" font-weight="700" fill="#1a4fa0">${yl}</text></svg>`}
+const sv=x=>`<div class="sv"><svg viewBox="0 0 380 190" width="380" style="max-width:100%;background:#f3f9ff;border-radius:8px">${x}</svg></div>`;
+const tx=(x,y,t,c='#000',a='middle')=>`<text x="${x}" y="${y}" font-size="13" font-weight="700" text-anchor="${a}" fill="${c}">${t}</text>`;
+const ar=(x1,y1,x2,y2,c)=>`<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${c}" stroke-width="4" marker-end="url(#h${c.slice(1)})"/><defs><marker id="h${c.slice(1)}" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0,0L8,4L0,8z" fill="${c}"/></marker></defs>`;
+const pipe=(S1,S2,v)=>sv(`<polygon points="20,40 130,40 190,75 350,75 350,115 190,115 130,150 20,150" fill="#4fc3f7" stroke="#01579b" stroke-width="3"/>${ar(30,95,100,95,'#d32f2f')}${tx(65,85,'v₁='+v+' м/с','#b71c1c')}${tx(75,30,'S₁='+S1+' см²','#01579b')}${tx(270,65,'S₂='+S2+' см²','#01579b')}${tx(270,100,'v₂ = ?','#b71c1c')}`);
+const lever=(F,a,b)=>{const k=130/Math.max(a,b),xl=190-a*k,xr=190+b*k;return sv(`<polygon points="190,100 165,150 215,150" fill="#8d6e63"/><rect x="30" y="92" width="320" height="8" fill="#5d4037"/><line x1="${xl}" y1="100" x2="${xl}" y2="125" stroke="#000" stroke-width="2"/><rect x="${xl-22}" y="125" width="44" height="30" fill="#ef5350"/>${tx(xl,145,F+' Н','#fff')}<line x1="${xr}" y1="100" x2="${xr}" y2="125" stroke="#000" stroke-width="2"/><rect x="${xr-22}" y="125" width="44" height="30" fill="#43a047"/>${tx(xr,145,'F₂=?','#fff')}${tx((xl+190)/2,75,a+' см','#1a4fa0')}${tx((xr+190)/2,75,b+' см','#1a4fa0')}${tx(190,175,'Рычаг в равновесии','#555')}`)};
+const tank=h=>sv(`<rect x="90" y="20" width="200" height="150" fill="#e1f5fe" stroke="#01579b" stroke-width="4"/><rect x="92" y="55" width="196" height="113" fill="#29b6f6" opacity=".8"/><line x1="92" y1="55" x2="288" y2="55" stroke="#01579b" stroke-width="2" stroke-dasharray="5"/>${ar(190,58,190,164,'#d32f2f')}${tx(220,115,'h = '+h+' м','#b71c1c','start')}${tx(190,185,'Вода, ρ = 1000 кг/м³, g = 10 м/с²','#555')}`);
+const press=(F,a,b)=>sv(`<rect x="40" y="70" width="50" height="90" fill="#bbdefb" stroke="#0d47a1" stroke-width="3"/><rect x="210" y="70" width="130" height="90" fill="#bbdefb" stroke="#0d47a1" stroke-width="3"/><rect x="40" y="130" width="300" height="30" fill="#29b6f6"/><rect x="38" y="60" width="54" height="12" fill="#546e7a"/><rect x="208" y="60" width="134" height="12" fill="#546e7a"/>${ar(65,15,65,58,'#d32f2f')}${tx(65,12,'F₁='+F+' Н','#b71c1c')}${tx(65,185,'S₁='+a+' см²','#0d47a1')}${tx(275,185,'S₂='+b+' см²','#0d47a1')}${tx(275,45,'F₂ = ?','#2e7d32')}${ar(275,50,275,58,'#2e7d32')}`);
+const carts=(m,v,M)=>sv(`<rect x="30" y="100" width="70" height="40" fill="#ef5350"/><rect x="230" y="100" width="90" height="40" fill="#42a5f5"/><circle cx="45" cy="148" r="8"/><circle cx="85" cy="148" r="8"/><circle cx="245" cy="148" r="8"/><circle cx="305" cy="148" r="8"/>${tx(65,125,m+' кг','#fff')}${tx(275,125,M+' кг','#fff')}${ar(105,115,180,115,'#2e7d32')}${tx(140,100,'v = '+v+' м/с','#1b5e20')}${tx(275,90,'покоится','#555')}<line x1="10" y1="156" x2="370" y2="156" stroke="#000" stroke-width="3"/>`);
+const circ=(R,v)=>sv(`<circle cx="190" cy="100" r="70" fill="#e8f5e9" stroke="#2e7d32" stroke-width="3"/><circle cx="190" cy="100" r="3"/><line x1="190" y1="100" x2="260" y2="100" stroke="#1565c0" stroke-width="3"/>${tx(225,92,'R = '+R+' м','#1565c0')}<circle cx="260" cy="100" r="9" fill="#e53935"/>${ar(260,100,260,35,'#6a1b9a')}${tx(300,60,'v = '+v+' м/с','#6a1b9a')}`);
+const earth=k=>{const r=40*Math.sqrt(k);return sv(`<circle cx="100" cy="95" r="${r}" fill="none" stroke="#9e9e9e" stroke-dasharray="6" stroke-width="2"/><circle cx="100" cy="95" r="40" fill="#2e7d32" stroke="#0d47a1" stroke-width="5"/><circle cx="${100+r}" cy="95" r="8" fill="#ff7043"/><line x1="100" y1="95" x2="140" y2="95" stroke="#fff" stroke-width="2"/>${tx(120,89,'R','#fff')}${tx(100+r,80,'спутник','#bf360c')}${tx(300,150,'h = '+(Math.sqrt(k)-1)+'R','#0d47a1')}`)};
+const forces=(a,b,m)=>sv(`<rect x="130" y="100" width="70" height="55" fill="#8d6e63"/>${tx(165,133,m+' кг','#fff')}${ar(200,128,200+a*14,128,'#d32f2f')}${tx(200+a*14-8,118,'F₁='+a+' Н','#b71c1c','end')}${ar(165,100,165,100-b*7,'#1565c0')}${tx(175,100-b*7+5,'F₂='+b+' Н','#0d47a1','start')}<line x1="10" y1="157" x2="370" y2="157" stroke="#000" stroke-width="3"/>${tx(190,180,'Силы взаимно перпендикулярны, трения нет','#555')}`);
+/* ---------- ЗАДАНИЯ ---------- */
+function build(v){const A=(x,y)=>v==1?x:y,fm=a=>a.map(fmt);
+const mc=(t,pts,q,svg,ok,d,u='')=>({t,pts,q,svg,ok:fmt(ok)+u,o:[ok,...d].map(x=>fmt(x)+u)});
+const NUM='Введите только число (без единиц измерения). Дробную часть пишите через запятую или точку. Пример: 12,5';
+const N=(l,a,p=1)=>({l,a,p,h:NUM}),W=(l,a,s)=>({l,a,p:1,s,h:'Ответьте одним–двумя словами строчными буквами. Пример: «вверх»'});
+const v1=A(2,3),S1=A(40,30),k=S1/10,H=A(20,30)**2/20,m1=A(2,3),u=A(6,8),m2=A(4,5),F1=A(20,30),d1=A(30,40),d2=60,hd=A(1.5,2.5),pp=A(40,60);
+const F8=A(100,90),S8=A(100,150),R=A(2,5),vc=A(4,10),vb=A(3,5),w=A(1,2),kk=A(4,9),Fa=A(6,9),Fb=A(8,12),tt=A(3,4);
+const v0=A(2,4),vt=A(10,16),T=[
+mc('Гидродинамика (10.1.5.1)',2,'Вода течёт по трубе, площадь сечения которой уменьшается (см. рисунок). Определите скорость воды v₂ в узкой части трубы.',pipe(S1,10,v1),v1*k,[v1,v1/k,v1*k*2],' м/с'),
+mc('Кинематика (10.1.1.1)',2,'По графику зависимости скорости тела от времени определите модуль его ускорения.',`<div class="sv">${graph(5,vt,2,[[0,v0],[4,vt]],'t, с','v, м/с')}</div>`,(vt-v0)/4,[(vt+v0)/4,vt/4,vt-v0],' м/с²'),
+mc('Движение тела, брошенного вертикально (10.1.2.3)',2,`Тело брошено вертикально вверх со скоростью ${A(20,30)} м/с. Сопротивлением воздуха пренебречь, g = 10 м/с². Какой максимальной высоты достигнет тело?`,'',H,[H*2,H/2,H*4],' м'),
+mc('Законы сохранения (10.1.4.1)',2,'Тело массой m сталкивается с неподвижным телом и слипается с ним (абсолютно неупругий удар). Определите скорость тел после удара.',carts(m1,u,m2),m1*u/(m1+m2),[u,u*m2/(m1+m2),u/2],' м/с'),
+mc('Статика (10.1.3.1)',2,'Рычаг находится в равновесии (см. рисунок). Чему равна сила F₂?',lever(F1,d1,d2),F1*d1/d2,[F1,F1*d2/d1,F1/4],' Н'),
+mc('Гидростатическое давление (10.1.3.3)',2,'Определите гидростатическое давление воды на дно сосуда.',tank(hd),hd*10,[hd,hd*100,hd*1000],' кПа'),
+{t:'Закон Паскаля (10.1.3.2)',pts:2,q:`На поршень закрытого сосуда с жидкостью создали добавочное давление ${pp} кПа. Как изменится давление в любой точке жидкости?`,svg:'',ok:'Увеличится на '+pp+' кПа',o:['Увеличится на '+pp+' кПа','Увеличится на '+pp/2+' кПа','Увеличится на '+pp*2+' кПа','Увеличится только у поршня']},
+{t:'Закон Паскаля, гидравлический пресс (10.1.3.2)',pts:3,q:'Гидравлический пресс (см. рисунок). Найдите:',svg:press(F8,5,S8),f:[N('а) давление под малым поршнем, кПа',F8/5*10),N('б) силу F₂ на большом поршне, Н',F8*S8/5),N('в) выигрыш в силе, раз',S8/5)]},
+{t:'Криволинейное движение (10.1.1.3)',pts:2,q:'Тело равномерно движется по окружности (см. рисунок).',svg:circ(R,vc),f:[N('а) центростремительное ускорение, м/с²',vc*vc/R),W('б) как направлено центростремительное ускорение?',['центр'],'к центру')]},
+{t:'Закон сложения скоростей (10.1.1.2)',pts:2,q:`Катер плывёт по реке. Скорость катера относительно воды ${vb} м/с, скорость течения ${w} м/с.`,svg:'',f:[N('а) скорость катера относительно берега при движении по течению, м/с',vb+w),N('б) скорость катера относительно берега против течения, м/с',vb-w)]},
+{t:'Графики движения (10.1.1.1)',pts:2,q:'Тело движется прямолинейно. По графику v(t) найдите:',svg:`<div class="sv">${graph(A(6,5),A(8,10),A(1,2),[[0,0],[2,A(6,8)],[A(6,5),A(6,8)]],'t, с','v, м/с')}</div>`,f:[N('а) ускорение на участке 0–2 с, м/с²',A(3,4)/1),N('б) путь за всё время движения, м',A(30,32))]},
+{t:'Закон всемирного тяготения (10.1.2.2)',pts:3,q:`Спутник движется по круговой орбите на высоте h = ${A('R','2R')} над поверхностью Земли (R — радиус Земли). Ускорение свободного падения у поверхности g = 10 м/с².`,svg:earth(kk),f:[N('а) во сколько раз сила тяготения на орбите меньше, чем у поверхности Земли',kk),N('б) ускорение свободного падения на орбите, м/с² (округлите до десятых)',10/kk),W('в) как называется состояние космонавта на орбите?',['невесомост'],'невесомость')]},
+{t:'Законы Ньютона (10.1.2.1)',pts:4,q:'На тело действуют две взаимно перпендикулярные силы (см. рисунок). Тело покоилось в начале движения, трение отсутствует. Найдите:',svg:forces(Fa,Fb,5),f:[N('а) равнодействующую сил, Н',Math.hypot(Fa,Fb)),N('б) ускорение тела, м/с²',Math.hypot(Fa,Fb)/5),W('в) каким законом Ньютона вы воспользовались для расчёта ускорения? (первый / второй / третий)',['втор'],'второй'),N(`г) скорость тела через ${tt} с, м/с`,Math.hypot(Fa,Fb)/5*tt)]}];
+T.forEach(t=>{if(t.o){for(let i=t.o.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[t.o[i],t.o[j]]=[t.o[j],t.o[i]]}}});
+T[10].f[0].a=A(3,4);return T}
+/* ---------- ЛОГИКА ---------- */
+let tasks,on=false,warn=0,end,tick,bw,bh,info;
+const chk=()=>$('go').disabled=!($('fio').value.trim().length>2&&$('cls').value&&$('var').value);
+['fio','cls','var'].forEach(i=>$(i).addEventListener('input',chk));
+const pw=p=>p+' '+(p<5?'балла':'баллов');
+$('go').onclick=()=>{info={fio:$('fio').value.trim(),cls:$('cls').value,v:+$('var').value};tasks=build(info.v);
+$('who').textContent=info.fio+' · '+info.cls+' · Вариант '+info.v;
+$('qs').innerHTML=tasks.map((t,i)=>`<div class="box card"><h3>Задание ${i+1}. ${t.t} <b>[${pw(t.pts)}]</b></h3><p>${t.q}</p>${t.svg||''}`+(t.o?t.o.map((o,j)=>`<label class="opt"><input type="radio" name="q${i}" value="${j}"> ${o}</label>`).join('')+'<small>Выберите один вариант ответа.</small>':t.f.map((f,j)=>`<div class="fr"><label>${f.l} <b style="color:#d84315">[${f.p} б.]</b></label><input type="text" id="f${i}_${j}" autocomplete="off" autocapitalize="off"><small>${f.h}</small></div>`).join(''))+'</div>').join('');
+$('s1').classList.add('hid');$('s2').classList.remove('hid');window.scrollTo(0,0);
+end=Date.now()+40*60000;tick=setInterval(()=>{const r=Math.max(0,end-Date.now()),s=Math.ceil(r/1000);$('tm').textContent=String(s/60|0).padStart(2,'0')+':'+String(s%60).padStart(2,'0');$('tm').className=r<300000?'low':'';if(r<=0)finish('Время истекло')},500);
+bw=innerWidth;bh=innerHeight;warn=0;setTimeout(()=>on=true,500)};
+$('fin').onclick=()=>{if(confirm('Завершить работу и отправить ответы?'))finish('Завершил сам')};
+/* античит */
+document.addEventListener('visibilitychange',()=>{if(on&&document.hidden)finish('Античит: свернул окно / сменил вкладку')});
+addEventListener('blur',()=>{if(on&&fine)setTimeout(()=>{if(on&&!document.hasFocus())finish('Античит: окно потеряло фокус')},500)});
+let rz;addEventListener('resize',()=>{if(!on)return;clearTimeout(rz);rz=setTimeout(()=>{const dw=Math.abs(innerWidth-bw),dh=Math.abs(innerHeight-bh);
+if(dw>60||(fine&&dh>120)){bw=innerWidth;bh=innerHeight;if(++warn>=2)finish('Античит: повторное изменение размера окна');else $('mod').style.display='flex'}else if(!fine)bh=innerHeight},400)});
+addEventListener('beforeunload',e=>{if(on){e.preventDefault();e.returnValue=''}});
+/* проверка */
+const norm=s=>s.toLowerCase().replace(/ё/g,'е').replace(/\s+/g,'');
+function ck(f,v){if(typeof f.a=='number'){const x=parseFloat(v.replace(',','.'));return !isNaN(x)&&Math.abs(x-f.a)<=Math.max(.06,Math.abs(f.a)*.01)}return f.a.some(w=>norm(v).includes(w))}
+function finish(reason){if(!on&&!tasks)return;if(!on)return;on=false;clearInterval(tick);let score=0,rows=[];
+tasks.forEach((t,i)=>{const n=i+1;if(t.o){const r=document.querySelector(`input[name=q${i}]:checked`),a=r?t.o[+r.value]:'нет ответа',ok=a==t.ok;if(ok)score+=t.pts;
+rows.push({ok,text:`№${n} [${ok?t.pts:0}/${t.pts}] Ответ: ${a}`+(ok?' ✔':` ✘ (верно: ${t.ok})`)})}
+else t.f.forEach((f,j)=>{const a=($(`f${i}_${j}`).value||'').trim(),ok=a!==''&&ck(f,a);if(ok)score+=f.p;
+rows.push({ok,text:`№${n}${'абвг'[j]} [${ok?f.p:0}/${f.p}] ${f.l.slice(3)}: ${a||'нет ответа'}`+(ok?' ✔':` ✘ (верно: ${f.s||fmt(f.a)})`)})})});
+const key='soch10_'+norm(info.fio)+info.cls+info.v,att=(+localStorage.getItem(key)||0)+1;localStorage.setItem(key,att);
+const d={fio:info.fio,cls:info.cls,variant:info.v,dt:new Date().toLocaleString('ru-RU'),score,max:30,attempt:att,device:navigator.userAgent.replace(/\s+/g,' ').slice(0,140)+' | '+screen.width+'x'+screen.height+(navigator.maxTouchPoints?' | touch':' | PC'),reason,rows};
+$('s2').classList.add('hid');$('mod').style.display='none';const r=$('s3');r.classList.remove('hid');
+r.innerHTML=`<h1>Работа завершена</h1><p><b>${info.fio}</b>, ${info.cls}, вариант ${info.v}</p><p style="font-size:26px">Балл: <b>${score} из 30</b></p><p id="st">Отправка результатов…</p>`+(reason!='Завершил сам'&&reason!='Время истекло'?`<p style="color:#c62828">Причина завершения: ${reason}</p>`:'');
+send(d,3)}
+async function send(d,n){try{if(URL_SCRIPT.startsWith('ВСТАВЬТЕ'))throw 0;await fetch(URL_SCRIPT,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(d)});$('st').innerHTML='✅ Результаты отправлены учителю.'}
+catch(e){if(n>1)setTimeout(()=>send(d,n-1),2000);else $('st').innerHTML='⚠ Не удалось отправить результаты. Сообщите учителю свой балл.'}}
+</script></body></html>
